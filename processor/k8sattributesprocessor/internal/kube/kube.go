@@ -221,6 +221,7 @@ type ExtractionRules struct {
 	ContainerImageName bool
 	ContainerImageTag  bool
 	ClusterUID         bool
+	ServiceName        bool
 
 	Annotations []FieldExtractionRule
 	Labels      []FieldExtractionRule
