@@ -259,9 +259,9 @@ run:
 
 .PHONY: docker-component # Not intended to be used directly
 docker-component: check-component
-	GOOS=linux GOARCH=amd64 $(MAKE) $(COMPONENT)
-	cp ./bin/$(COMPONENT)_linux_amd64 ./cmd/$(COMPONENT)/$(COMPONENT)
-	docker build -t $(COMPONENT) ./cmd/$(COMPONENT)/
+	GOOS=linux GOARCH=$(GOARCH) $(MAKE) $(COMPONENT)
+	cp ./bin/$(COMPONENT)_linux_$(GOARCH) ./cmd/$(COMPONENT)/$(COMPONENT)
+	docker build --platform linux/$(GOARCH) -t $(COMPONENT) ./cmd/$(COMPONENT)/
 	rm ./cmd/$(COMPONENT)/$(COMPONENT)
 
 .PHONY: check-component
@@ -272,7 +272,7 @@ endif
 
 .PHONY: docker-otelcontribcol
 docker-otelcontribcol:
-	COMPONENT=otelcontribcol $(MAKE) docker-component
+	COMPONENT=otelcontribcol GOARCH=$(GOARCH) $(MAKE) docker-component
 
 .PHONY: docker-telemetrygen
 docker-telemetrygen:
