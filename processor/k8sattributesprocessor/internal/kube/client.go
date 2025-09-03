@@ -715,6 +715,7 @@ func (c *WatchClient) getPodServiceName(pod *api_v1.Pod) (string, error) {
 	// Endpoint of the pod.
 	podIP := pod.Status.PodIP
 
+	c.logger.Debug(" get service name " + ns + " " + podIP)
 	// Get all of the services within the namespace the pod belongs to.
 	services, err := c.kc.CoreV1().Services(ns).List(context.Background(), meta_v1.ListOptions{})
 	if err != nil {
@@ -723,11 +724,14 @@ func (c *WatchClient) getPodServiceName(pod *api_v1.Pod) (string, error) {
 
 	// Iterate through each service in the namespace and find the first match between the podIP and the service's endpoint.
 	for _, svc := range services.Items {
+		c.logger.Debug(" checking service " + svc.Name + " " + svc.Spec.ClusterIP)
+
 		endpoints, err := c.kc.CoreV1().Endpoints(ns).Get(context.Background(), svc.Name, meta_v1.GetOptions{})
 		if err != nil {
+			c.logger.Debug("error in getting endpoint", zap.Any("err", err.Error()))
 			continue
 		}
-
+		c.logger.Debug(" checking endpoints " + fmt.Sprintf("%v", endpoints.Subsets))
 		for _, subset := range endpoints.Subsets {
 			for _, address := range subset.Addresses {
 				if address.IP == podIP {
